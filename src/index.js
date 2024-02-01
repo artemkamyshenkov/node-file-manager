@@ -37,6 +37,27 @@ async function navigateToDirectory(directory) {
   }
 }
 
+// TODO: Сортировка + индексы + подпись файл или папка в заголовке
+async function printFilesAndFolders() {
+  const files = await fsPromises.readdir(currentDirectory, {
+    withFileTypes: true,
+  });
+  const folders = files
+    ?.filter((file) => file.isDirectory())
+    .sort((a, b) => a?.name.localeCompare(b?.name))
+    .map((file, idx) => `${idx + 1}. ${file.name} | Type: directory`);
+
+  const filesInFolder = files
+    ?.filter((file) => file.isFile())
+    .sort((a, b) => a?.name.localeCompare(b?.name))
+    .map((file, idx) => `${idx + 1}. ${file.name} | Type: file`);
+
+  console.log('Folders:');
+  folders.forEach((folder) => console.log(folder));
+  console.log('Files: ');
+  filesInFolder.forEach((file) => console.log(file));
+}
+
 const handleCommand = (command) => {
   if (command === '.exit') {
     rl.close();
@@ -46,6 +67,10 @@ const handleCommand = (command) => {
   } else if (command.startsWith('cd')) {
     const dir = command.slice(3).trim();
     navigateToDirectory(dir);
+  } else if (command === 'ls') {
+    printFilesAndFolders();
+  } else {
+    console.log('Invalid input');
   }
 };
 
