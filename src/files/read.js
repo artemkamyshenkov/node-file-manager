@@ -1,7 +1,7 @@
 import { promises as fsPromises, constants } from 'fs';
 import path from 'path';
 
-export const readFileByPath = async (currentDirectory, targetFilePath) => {
+export const readFileByPath = async (currentDirectory, targetFilePath, cb) => {
   try {
     const filePath = path.join(currentDirectory, targetFilePath);
     console.log('read', filePath);
@@ -10,5 +10,7 @@ export const readFileByPath = async (currentDirectory, targetFilePath) => {
     console.log(read);
   } catch (error) {
     console.log('Operation failed');
+  } finally {
+    cb(currentDirectory);
   }
 };

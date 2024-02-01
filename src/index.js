@@ -9,6 +9,7 @@ import {
 } from './messages/index.js';
 import { promises as fsPromises, constants } from 'fs';
 import { readFileByPath } from './files/read.js';
+import { createFile } from './files/create.js';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -74,7 +75,10 @@ const handleCommand = (command) => {
     printFilesAndFolders();
   } else if (command.startsWith('cat')) {
     const pathToFile = command.slice(3).trim();
-    readFileByPath(currentDirectory, pathToFile);
+    readFileByPath(currentDirectory, pathToFile, printCurrentDirectory);
+  } else if (command.startsWith('add')) {
+    const fileName = command.slice(3).trim();
+    createFile(currentDirectory, fileName, printCurrentDirectory);
   } else {
     console.log('Invalid input');
   }
