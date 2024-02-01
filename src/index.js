@@ -10,6 +10,7 @@ import {
 import { promises as fsPromises, constants } from 'fs';
 import { readFileByPath } from './files/read.js';
 import { createFile } from './files/create.js';
+import { renameFile } from './files/rename.js';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -17,7 +18,6 @@ const rl = readline.createInterface({
 });
 
 const homeDirectory = os.homedir();
-// TODO: вынести в глобальную переменную
 let currentDirectory = homeDirectory;
 
 console.log(greetMessage(getUsername()));
@@ -29,6 +29,7 @@ const navigateUp = () => {
     currentDirectory = parentDirectory;
   }
 };
+
 async function navigateToDirectory(directory) {
   try {
     const targetDirectory = path.resolve(currentDirectory, directory);
@@ -79,6 +80,9 @@ const handleCommand = (command) => {
   } else if (command.startsWith('add')) {
     const fileName = command.slice(3).trim();
     createFile(currentDirectory, fileName, printCurrentDirectory);
+  } else if (command.startsWith('rn')) {
+    const data = command.slice(3).trim().split(' ');
+    renameFile(currentDirectory, data[0], data[1], printCurrentDirectory);
   } else {
     console.log('Invalid input');
   }
