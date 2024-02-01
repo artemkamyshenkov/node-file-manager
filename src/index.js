@@ -8,14 +8,18 @@ import {
   byeMessage,
 } from './messages/index.js';
 import { promises as fsPromises, constants } from 'fs';
+import { readFileByPath } from './files/read.js';
 
-const homeDirectory = os.homedir();
-let currentDirectory = homeDirectory;
-console.log(greetMessage(getUsername()));
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
+
+const homeDirectory = os.homedir();
+// TODO: вынести в глобальную переменную
+let currentDirectory = homeDirectory;
+
+console.log(greetMessage(getUsername()));
 
 const navigateUp = () => {
   const parentDirectory = path.resolve(currentDirectory, '..');
@@ -37,7 +41,6 @@ async function navigateToDirectory(directory) {
   }
 }
 
-// TODO: Сортировка + индексы + подпись файл или папка в заголовке
 async function printFilesAndFolders() {
   const files = await fsPromises.readdir(currentDirectory, {
     withFileTypes: true,
@@ -69,6 +72,9 @@ const handleCommand = (command) => {
     navigateToDirectory(dir);
   } else if (command === 'ls') {
     printFilesAndFolders();
+  } else if (command.startsWith('cat')) {
+    const pathToFile = command.slice(3).trim();
+    readFileByPath(currentDirectory, pathToFile);
   } else {
     console.log('Invalid input');
   }
