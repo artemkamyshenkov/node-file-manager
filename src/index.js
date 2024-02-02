@@ -1,16 +1,19 @@
+import { constants, promises as fsPromises } from 'fs';
 import readline from 'node:readline';
-import path from 'path';
 import os from 'os';
+import path from 'path';
+import { copyFile } from './files/copy.js';
+import { createFile } from './files/create.js';
+import { readFileByPath } from './files/read.js';
+import { renameFile } from './files/rename.js';
 import {
-  printCurrentDirectory,
+  byeMessage,
   getUsername,
   greetMessage,
-  byeMessage,
+  printCurrentDirectory,
 } from './messages/index.js';
-import { promises as fsPromises, constants } from 'fs';
-import { readFileByPath } from './files/read.js';
-import { createFile } from './files/create.js';
-import { renameFile } from './files/rename.js';
+import { moveFile } from './files/moveFile.js';
+import { removeFile } from './files/remove.js';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -75,14 +78,25 @@ const handleCommand = (command) => {
   } else if (command === 'ls') {
     printFilesAndFolders();
   } else if (command.startsWith('cat')) {
+    // TODO: в отдельную функцию отбор аргументов
     const pathToFile = command.slice(3).trim();
     readFileByPath(currentDirectory, pathToFile, printCurrentDirectory);
   } else if (command.startsWith('add')) {
     const fileName = command.slice(3).trim();
     createFile(currentDirectory, fileName, printCurrentDirectory);
   } else if (command.startsWith('rn')) {
+    // TODO: ref args
     const data = command.slice(3).trim().split(' ');
     renameFile(currentDirectory, data[0], data[1], printCurrentDirectory);
+  } else if (command.startsWith('cp')) {
+    const paths = command.slice(3).trim().split(' ');
+    copyFile(currentDirectory, paths[0], paths[1], printCurrentDirectory);
+  } else if (command.startsWith('mv')) {
+    const paths = command.slice(3).trim().split(' ');
+    moveFile(currentDirectory, paths[0], paths[1], printCurrentDirectory);
+  } else if (command.startsWith('rm')) {
+    const filePath = command.slice(3).trim();
+    removeFile(currentDirectory, filePath, printCurrentDirectory);
   } else {
     console.log('Invalid input');
   }
