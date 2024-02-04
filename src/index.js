@@ -14,6 +14,8 @@ import {
 } from './messages/index.js';
 import { moveFile } from './files/moveFile.js';
 import { removeFile } from './files/remove.js';
+import { getOsArgs } from './os/getOsArgs.js';
+import { getOsCpus } from './os/getOsCpus.js';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -97,6 +99,10 @@ const handleCommand = (command) => {
   } else if (command.startsWith('rm')) {
     const filePath = command.slice(3).trim();
     removeFile(currentDirectory, filePath, printCurrentDirectory);
+  } else if (getOsArgs(command) === 'EOL') {
+    console.log(JSON.stringify(os.EOL));
+  } else if (getOsArgs(command) === 'cpus') {
+    getOsCpus();
   } else {
     console.log('Invalid input');
   }
