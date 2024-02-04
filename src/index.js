@@ -17,6 +17,8 @@ import { removeFile } from './files/remove.js';
 import { getOsArgs } from './os/getOsArgs.js';
 import { getOsCpus } from './os/getOsCpus.js';
 import { getHash } from './hash/getHash.js';
+import { compress } from './zip/compress.js';
+import { decompress } from './zip/decompress.js';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -112,8 +114,13 @@ const handleCommand = (command) => {
     console.log(process.arch);
   } else if (command.startsWith('hash')) {
     const pathToFile = command.split(' ')[1].trim();
-    console.log('path', pathToFile);
     getHash(currentDirectory, pathToFile, printCurrentDirectory);
+  } else if (command.startsWith('compress')) {
+    const data = command.split(' ');
+    compress(currentDirectory, data[1], data[2], printCurrentDirectory);
+  } else if (command.startsWith('decompress')) {
+    const data = command.split(' ');
+    decompress(currentDirectory, data[1], data[2], printCurrentDirectory);
   } else {
     console.log('Invalid input');
   }
