@@ -16,6 +16,7 @@ import { moveFile } from './files/moveFile.js';
 import { removeFile } from './files/remove.js';
 import { getOsArgs } from './os/getOsArgs.js';
 import { getOsCpus } from './os/getOsCpus.js';
+import { getHash } from './hash/getHash.js';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -109,6 +110,10 @@ const handleCommand = (command) => {
     console.log(os.userInfo().username);
   } else if (getOsArgs(command) === 'architecture') {
     console.log(process.arch);
+  } else if (command.startsWith('hash')) {
+    const pathToFile = command.split(' ')[1].trim();
+    console.log('path', pathToFile);
+    getHash(currentDirectory, pathToFile, printCurrentDirectory);
   } else {
     console.log('Invalid input');
   }
