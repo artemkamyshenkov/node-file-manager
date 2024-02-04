@@ -103,6 +103,12 @@ const handleCommand = (command) => {
     console.log(JSON.stringify(os.EOL));
   } else if (getOsArgs(command) === 'cpus') {
     getOsCpus();
+  } else if (getOsArgs(command) === 'homedir') {
+    console.log(homeDirectory);
+  } else if (getOsArgs(command) === 'username') {
+    console.log(os.userInfo().username);
+  } else if (getOsArgs(command) === 'architecture') {
+    console.log(process.arch);
   } else {
     console.log('Invalid input');
   }
