@@ -4,15 +4,12 @@ import { fileURLToPath } from 'url';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const renameFilePath = path.join(dirname, 'files', 'properFilename.md');
-
 export const renameFile = async (
   currentDirectory,
   pathToFile,
   newFileName,
   cb,
 ) => {
-  // TODO: refactor args, var
   const isRenameFileWithExt = newFileName.split('.').length > 1;
   const extension = pathToFile.split('.').pop();
   const newFileNameWithExt = isRenameFileWithExt

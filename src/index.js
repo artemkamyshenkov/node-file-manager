@@ -19,6 +19,8 @@ import { getOsCpus } from './os/getOsCpus.js';
 import { getHash } from './hash/getHash.js';
 import { compress } from './zip/compress.js';
 import { decompress } from './zip/decompress.js';
+import { printFilesAndFolders } from './files/printFiles.js';
+import { getCommandArgs } from './helpers/getCommandArgs.js';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -36,6 +38,7 @@ const navigateUp = () => {
     process.chdir(parentDirectory);
     currentDirectory = parentDirectory;
   }
+  printCurrentDirectory(currentDirectory);
 };
 
 async function navigateToDirectory(directory) {
@@ -51,57 +54,44 @@ async function navigateToDirectory(directory) {
   }
 }
 
-async function printFilesAndFolders() {
-  const files = await fsPromises.readdir(currentDirectory, {
-    withFileTypes: true,
-  });
-  const folders = files
-    ?.filter((file) => file.isDirectory())
-    .sort((a, b) => a?.name.localeCompare(b?.name))
-    .map((file, idx) => `${idx + 1}. ${file.name} | Type: directory`);
-
-  const filesInFolder = files
-    ?.filter((file) => file.isFile())
-    .sort((a, b) => a?.name.localeCompare(b?.name))
-    .map((file, idx) => `${idx + 1}. ${file.name} | Type: file`);
-
-  console.log('Folders:');
-  folders.forEach((folder) => console.log(folder));
-  console.log('Files: ');
-  filesInFolder.forEach((file) => console.log(file));
-}
-
 const handleCommand = (command) => {
+  const args = getCommandArgs(command);
+
   if (command === '.exit') {
     rl.close();
   } else if (command === 'up') {
     navigateUp();
-    printCurrentDirectory(currentDirectory);
-  } else if (command.startsWith('cd')) {
-    const dir = command.slice(3).trim();
-    navigateToDirectory(dir);
-  } else if (command === 'ls') {
-    printFilesAndFolders();
-  } else if (command.startsWith('cat')) {
-    // TODO: в отдельную функцию отбор аргументов
-    const pathToFile = command.slice(3).trim();
-    readFileByPath(currentDirectory, pathToFile, printCurrentDirectory);
-  } else if (command.startsWith('add')) {
-    const fileName = command.slice(3).trim();
-    createFile(currentDirectory, fileName, printCurrentDirectory);
-  } else if (command.startsWith('rn')) {
-    // TODO: ref args
-    const data = command.slice(3).trim().split(' ');
-    renameFile(currentDirectory, data[0], data[1], printCurrentDirectory);
-  } else if (command.startsWith('cp')) {
-    const paths = command.slice(3).trim().split(' ');
-    copyFile(currentDirectory, paths[0], paths[1], printCurrentDirectory);
-  } else if (command.startsWith('mv')) {
-    const paths = command.slice(3).trim().split(' ');
-    moveFile(currentDirectory, paths[0], paths[1], printCurrentDirectory);
-  } else if (command.startsWith('rm')) {
-    const filePath = command.slice(3).trim();
-    removeFile(currentDirectory, filePath, printCurrentDirectory);
+  } else if (args.action === 'cd') {
+    navigateToDirectory(args.pathFrom);
+  } else if (args.action === 'ls') {
+    printFilesAndFolders(currentDirectory);
+  } else if (args.action === 'cat') {
+    readFileByPath(currentDirectory, args.pathFrom, printCurrentDirectory);
+  } else if (args.action === 'add') {
+    createFile(currentDirectory, args.pathFrom, printCurrentDirectory);
+  } else if (args.action === 'rn') {
+    renameFile(
+      currentDirectory,
+      args.pathFrom,
+      args.pathTo,
+      printCurrentDirectory,
+    );
+  } else if (args.action === 'cp') {
+    copyFile(
+      currentDirectory,
+      args.pathFrom,
+      args.pathTo,
+      printCurrentDirectory,
+    );
+  } else if (args.action === 'mv') {
+    moveFile(
+      currentDirectory,
+      args.pathFrom,
+      args.pathTo,
+      printCurrentDirectory,
+    );
+  } else if (args.action === 'rm') {
+    removeFile(currentDirectory, args.pathFrom, printCurrentDirectory);
   } else if (getOsArgs(command) === 'EOL') {
     console.log(JSON.stringify(os.EOL));
   } else if (getOsArgs(command) === 'cpus') {
@@ -112,15 +102,22 @@ const handleCommand = (command) => {
     console.log(os.userInfo().username);
   } else if (getOsArgs(command) === 'architecture') {
     console.log(process.arch);
-  } else if (command.startsWith('hash')) {
-    const pathToFile = command.split(' ')[1].trim();
-    getHash(currentDirectory, pathToFile, printCurrentDirectory);
-  } else if (command.startsWith('compress')) {
-    const data = command.split(' ');
-    compress(currentDirectory, data[1], data[2], printCurrentDirectory);
-  } else if (command.startsWith('decompress')) {
-    const data = command.split(' ');
-    decompress(currentDirectory, data[1], data[2], printCurrentDirectory);
+  } else if (args.action === 'hash') {
+    getHash(currentDirectory, args.pathFrom, printCurrentDirectory);
+  } else if (args.action === 'compress') {
+    compress(
+      currentDirectory,
+      args.pathFrom,
+      args.pathTo,
+      printCurrentDirectory,
+    );
+  } else if (args.action === 'decompress') {
+    decompress(
+      currentDirectory,
+      args.pathFrom,
+      args.pathTo,
+      printCurrentDirectory,
+    );
   } else {
     console.log('Invalid input');
   }
